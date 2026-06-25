@@ -38,6 +38,7 @@ ScaffoldingReadMe.txt
 
 # dotenv environment variables file
 .env
+*.user
 
 # Others
 ~$*
@@ -55,3 +56,5 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+.vs/

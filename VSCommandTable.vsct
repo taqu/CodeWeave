@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<Extern href="stdidcmd.h"/>
+	<Extern href="vsshlids.h"/>
+	<Include href="KnownImageIds.vsct"/>
+	<Include href="VSGlobals.vsct"/>
+
+	<Commands package="CodeWeave">
+		<Groups>
+			<Group guid="CodeWeave" id="CodeWeave_CommandGroup" priority="0x0600">
+				<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
+			</Group>
+			<Group guid="CodeWeave" id="CodeWeave_ViewCommandGroup" priority="0x0600">
+				<Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+			</Group>
+
+			<Group guid="CodeWeave" id="CodeWeave_SubMenuGroup" priority="0x0100">
+				<Parent guid="CodeWeave" id="CodeWeave_Menu" />
+			</Group>
+			<Group guid="CodeWeave" id="CodeWeave_ViewSubMenuGroup" priority="0x0100">
+				<Parent guid="CodeWeave" id="CodeWeave_ViewMenu" />
+			</Group>
+		</Groups>
+
+		<Menus>
+			<Menu guid="CodeWeave" id="CodeWeave_Menu" type="Menu">
+				<Parent guid="CodeWeave" id="CodeWeave_CommandGroup" />
+				<Icon guid="ImageCatalogGuid" id="ToolBox" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>CodeWeave</ButtonText>
+				</Strings>
+			</Menu>
+			<Menu guid="CodeWeave" id="CodeWeave_ViewMenu" type="Menu">
+				<Parent guid="CodeWeave" id="CodeWeave_ViewCommandGroup" />
+				<Icon guid="ImageCatalogGuid" id="ToolBox" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>CodeWeave</ButtonText>
+				</Strings>
+			</Menu>
+		</Menus>
+
+		<Buttons>
+			<Button guid="CodeWeave" id="CommandCompletion" priority="0x0100" type="Button">
+				<Parent guid="CodeWeave" id="CodeWeave_SubMenuGroup" />
+				<Icon guid="ImageCatalogGuid" id="Writeable" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Completion</ButtonText>
+					<LocCanonicalName>.CodeWeave.CommandCompletion</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="CodeWeave" id="CommandShowChatWindow" priority="0x0100" type="Button">
+				<Parent guid="CodeWeave" id="CodeWeave_ViewSubMenuGroup" />
+				<Icon guid="ImageCatalogGuid" id="Writeable" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Chat Window</ButtonText>
+					<LocCanonicalName>.CodeWeave.CommandShowChatWindow</LocCanonicalName>
+				</Strings>
+			</Button>
+		</Buttons>
+	</Commands>
+
+	<Symbols>
+		<GuidSymbol name="CodeWeave" value="{de94022d-cce2-425f-882c-ec1f9f9dfdc9}">
+			<IDSymbol name="CodeWeave_CommandGroup" value="0x0001" />
+			<IDSymbol name="CodeWeave_ViewCommandGroup" value="0x0002"/>
+			<IDSymbol name="CodeWeave_SubMenuGroup" value="0x0003" />
+			<IDSymbol name="CodeWeave_ViewSubMenuGroup" value="0x0004"/>
+			<IDSymbol name="CodeWeave_Menu" value="0x0010" />
+			<IDSymbol name="CodeWeave_ViewMenu" value="0x0020" />
+			<IDSymbol name="CommandCompletion" value="0x0100" />
+			<IDSymbol name="CommandShowChatWindow" value="0x0101" />
+		</GuidSymbol>
+	</Symbols>
+</CommandTable>
