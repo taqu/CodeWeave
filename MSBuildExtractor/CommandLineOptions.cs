@@ -1,0 +1,346 @@
+
+using System.Collections.Generic;
+using System.CommandLine;
+
+namespace MSBuild.CompileCommands.Extractor
+{
+    public class CommandLineOptions
+    {
+        public string[] Projects { get; set; } = [];
+        public string[] Solutions { get; set; } = [];
+
+        public string? Project => Projects.Length == 1 ? Projects[0] : null;
+        public string? Solution => Solutions.Length == 1 ? Solutions[0] : null;
+        public string Configuration { get; set; } = "Debug";
+        public string Platform { get; set; } = "x64";
+        public string? VsPath { get; set; }
+        public string? VcTargetsPath { get; set; }
+        public string? ClPath { get; set; }
+        public string? SolutionDir { get; set; }
+        public string? VcToolsInstallDir { get; set; }
+        public string? MsBuildPath { get; set; }
+        public string? Output { get; set; }
+        public bool EnableLogger { get; set; }
+        public bool UseDevEnv { get; set; }
+        public bool AllConfigurations { get; set; }
+        public bool Merge { get; set; }
+        public bool Strict { get; set; }
+        public bool Validate { get; set; }
+        public string Format { get; set; } = "standard";
+        public bool Deduplicate { get; set; }
+        public string PreferConfiguration { get; set; } = "Debug";
+        public string PreferPlatform { get; set; } = "x64";
+        public bool ListInstances { get; set; }
+        public string? VsInstance { get; set; }
+        public bool EmitCCppProperties { get; set; }
+        public bool EmitDefaults { get; set; }
+        public bool MergeDefaults { get; set; }
+        public bool SplitByProject { get; set; }
+        public bool UseCache { get; set; }
+        public Dictionary<string, string> MsBuildProperties { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> MsBuildEnv { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        public string MsBuildLauncher { get; set; } = "auto";
+        public string IncludePathOrder { get; set; } = "auto";
+
+        public static CommandLineOptions Parse(string[] args)
+        {
+            CommandLineOptions? result = null;
+
+            var projectOption = new Option<string[]>("--project", "-p")
+            {
+                Description = "Path to .vcxproj file (can be specified multiple times)",
+                AllowMultipleArgumentsPerToken = true
+            };
+
+            var solutionOption = new Option<string[]>("--solution", "-s")
+            {
+                Description = "Path to .sln or .slnx file (can be specified multiple times)",
+                AllowMultipleArgumentsPerToken = true
+            };
+
+            var configOption = new Option<string>("--configuration", "-c")
+            {
+                Description = "Build configuration",
+                DefaultValueFactory = _ => "Debug"
+            };
+
+            var platformOption = new Option<string>("--platform", "-a")
+            {
+                Description = "Build platform",
+                DefaultValueFactory = _ => "x64"
+            };
+
+            var vsPathOption = new Option<string?>("--vs-path")
+            {
+                Description = "Path to Visual Studio installation"
+            };
+
+            var vcTargetsPathOption = new Option<string?>("--vc-targets-path")
+            {
+                Description = "Path to VC targets (e.g. ...\\MSBuild\\Microsoft\\VC\\v180)"
+            };
+
+            var clPathOption = new Option<string?>("--cl-path")
+            {
+                Description = "Path to cl.exe"
+            };
+
+            var solutionDirOption = new Option<string?>("--solution-dir")
+            {
+                Description = "Value for the SolutionDir MSBuild property (auto-derived when using --solution)"
+            };
+
+            var vcToolsInstallDirOption = new Option<string?>("--vc-tools-install-dir")
+            {
+                Description = "Value for the VCToolsInstallDir MSBuild property"
+            };
+
+            var outputOption = new Option<string?>("--output", "-o")
+            {
+                Description = "Output path for compile_commands.json"
+            };
+
+            var loggerOption = new Option<bool>("--logger")
+            {
+                Description = "Enable MSBuild console logger output",
+                DefaultValueFactory = _ => false
+            };
+
+            var useDevEnvOption = new Option<bool>("--use-dev-env")
+            {
+                Description = "Read environment variables from Developer Command Prompt (VCToolsInstallDir, VCTargetsPath, etc.)",
+                DefaultValueFactory = _ => false
+            };
+
+            var msbuildPathOption = new Option<string?>("--msbuild-path")
+            {
+                Description = "Path to msbuild.exe (enables out-of-process mode for custom MSBuild/toolchain locations)"
+            };
+
+            var allConfigsOption = new Option<bool>("--all-configurations")
+            {
+                Description = "Extract for all configuration/platform combinations found in the project or solution",
+                DefaultValueFactory = _ => false
+            };
+
+            var mergeOption = new Option<bool>("--merge")
+            {
+                Description = "Merge all configurations into a single output file (use with --all-configurations)",
+                DefaultValueFactory = _ => false
+            };
+
+            var strictOption = new Option<bool>("--strict")
+            {
+                Description = "Treat configuration/platform validation warnings as errors",
+                DefaultValueFactory = _ => false
+            };
+
+            var validateOption = new Option<bool>("--validate")
+            {
+                Description = "After extraction, verify each compile command by running cl.exe /c",
+                DefaultValueFactory = _ => false
+            };
+
+            var formatOption = new Option<string>("--format", "-f")
+            {
+                Description = "Output format: 'standard' (compile_commands.json) or 'rich' (hierarchical compile_database.json)",
+                DefaultValueFactory = _ => "standard"
+            };
+            formatOption.AcceptOnlyFromAmong("standard", "rich");
+
+            var deduplicateOption = new Option<bool>("--deduplicate")
+            {
+                Description = "Merge duplicate entries for the same file into one best-compromise entry for IntelliSense",
+                DefaultValueFactory = _ => false
+            };
+
+            var preferConfigOption = new Option<string>("--prefer-configuration")
+            {
+                Description = "Preferred configuration for conflict resolution during deduplication (default: Debug)",
+                DefaultValueFactory = _ => "Debug"
+            };
+
+            var preferPlatformOption = new Option<string>("--prefer-platform")
+            {
+                Description = "Preferred platform for conflict resolution during deduplication (default: x64)",
+                DefaultValueFactory = _ => "x64"
+            };
+
+            var listInstancesOption = new Option<bool>("--list-instances", "--list-vs")
+            {
+                Description = "List all Visual Studio installations and exit"
+            };
+
+            var vsInstanceOption = new Option<string?>("--vs-instance")
+            {
+                Description = "Select VS installation by instance ID (use --list-instances to see available)"
+            };
+
+            var cCppPropertiesOption = new Option<bool>("--c-cpp-properties")
+            {
+                Description = "Emit a .vscode/c_cpp_properties.json pointing to the generated compile_commands.json",
+                DefaultValueFactory = _ => false
+            };
+
+            var emitDefaultsOption = new Option<bool>("--emit-defaults")
+            {
+                Description = "Include the project-wide default compile entry in the output (synthetic __project_defaults.cpp with the baseline switches for the project)",
+                DefaultValueFactory = _ => false
+            };
+
+            var mergeDefaultsOption = new Option<bool>("--merge-defaults")
+            {
+                Description = "Merge project-wide default switches (defines, language standard, warning level, etc.) into each per-file entry when they are not already present",
+                DefaultValueFactory = _ => false
+            };
+
+            var splitByProjectOption = new Option<bool>("--split-by-project")
+            {
+                Description = "Write a separate compile_commands_{ProjectName}.json per project into the output directory (--output is treated as a directory path when this flag is set)",
+                DefaultValueFactory = _ => true
+            };
+
+            var useCacheOption = new Option<bool>("--cache")
+            {
+                Description = "Enable delta-evaluation caching: skip MSBuild evaluation for .vcxproj files whose SHA-256 hash has not changed since the last run (.extractor_cache.json is written to the output directory)",
+                DefaultValueFactory = _ => true
+            };
+
+            var msbuildPropertyOption = new Option<string[]>("--msbuild-property")
+            {
+                Description = "Pass an MSBuild global property as KEY=VALUE (repeatable). Overrides built-in defaults (e.g. BuildProjectReferences=true).",
+                AllowMultipleArgumentsPerToken = false
+            };
+
+            var msbuildEnvOption = new Option<string[]>("--msbuild-env")
+            {
+                Description = "Set an environment variable for the MSBuild process as KEY=VALUE (repeatable). Overrides built-in defaults.",
+                AllowMultipleArgumentsPerToken = false
+            };
+
+            var msbuildLauncherOption = new Option<string>("--msbuild-launcher")
+            {
+                Description = "How to launch MSBuild: auto (sniff extension, default), cmd (force cmd.exe /c wrapper), direct (run executable directly), dotnet (force dotnet exec)",
+                DefaultValueFactory = _ => "auto"
+            };
+            msbuildLauncherOption.AcceptOnlyFromAmong("auto", "cmd", "direct", "dotnet");
+
+            var includePathOrderOption = new Option<string>("--include-path-order")
+            {
+                Description = "Where to place include paths from MSBuild's IncludePath/ExternalIncludePath properties: auto (per-path heuristic, default), prepend (before /I), append (after /I, matches cl.exe INCLUDE-env semantics)",
+                DefaultValueFactory = _ => "auto"
+            };
+            includePathOrderOption.AcceptOnlyFromAmong("auto", "prepend", "append");
+
+            var rootCommand = new RootCommand("Extract compile_commands.json from Visual C++ MSBuild projects");
+            rootCommand.Options.Add(projectOption);
+            rootCommand.Options.Add(solutionOption);
+            rootCommand.Options.Add(configOption);
+            rootCommand.Options.Add(platformOption);
+            rootCommand.Options.Add(vsPathOption);
+            rootCommand.Options.Add(vcTargetsPathOption);
+            rootCommand.Options.Add(clPathOption);
+            rootCommand.Options.Add(solutionDirOption);
+            rootCommand.Options.Add(vcToolsInstallDirOption);
+            rootCommand.Options.Add(msbuildPathOption);
+            rootCommand.Options.Add(outputOption);
+            rootCommand.Options.Add(loggerOption);
+            rootCommand.Options.Add(useDevEnvOption);
+            rootCommand.Options.Add(allConfigsOption);
+            rootCommand.Options.Add(mergeOption);
+            rootCommand.Options.Add(strictOption);
+            rootCommand.Options.Add(validateOption);
+            rootCommand.Options.Add(formatOption);
+            rootCommand.Options.Add(deduplicateOption);
+            rootCommand.Options.Add(preferConfigOption);
+            rootCommand.Options.Add(preferPlatformOption);
+            rootCommand.Options.Add(listInstancesOption);
+            rootCommand.Options.Add(vsInstanceOption);
+            rootCommand.Options.Add(cCppPropertiesOption);
+            rootCommand.Options.Add(emitDefaultsOption);
+            rootCommand.Options.Add(mergeDefaultsOption);
+            rootCommand.Options.Add(splitByProjectOption);
+            rootCommand.Options.Add(useCacheOption);
+            rootCommand.Options.Add(msbuildPropertyOption);
+            rootCommand.Options.Add(msbuildEnvOption);
+            rootCommand.Options.Add(msbuildLauncherOption);
+            rootCommand.Options.Add(includePathOrderOption);
+
+            rootCommand.Validators.Add(commandResult =>
+            {
+                var listInstances = commandResult.GetValue(listInstancesOption);
+                if (listInstances)
+                    return;
+
+                var projects = commandResult.GetValue(projectOption) ?? [];
+                var solutions = commandResult.GetValue(solutionOption) ?? [];
+
+                if (projects.Length == 0 && solutions.Length == 0)
+                    commandResult.AddError("At least one --project or --solution must be specified.");
+
+                if (commandResult.GetValue(cCppPropertiesOption) && commandResult.GetValue(formatOption) == "rich")
+                    commandResult.AddError("--c-cpp-properties cannot be used with --format rich (rich format does not produce compile_commands.json).");
+            });
+
+            rootCommand.SetAction(parseResult =>
+            {
+                result = new CommandLineOptions
+                {
+                    Projects = parseResult.GetValue(projectOption) ?? [],
+                    Solutions = parseResult.GetValue(solutionOption) ?? [],
+                    Configuration = parseResult.GetValue(configOption)!,
+                    Platform = parseResult.GetValue(platformOption)!,
+                    VsPath = parseResult.GetValue(vsPathOption),
+                    VcTargetsPath = parseResult.GetValue(vcTargetsPathOption),
+                    ClPath = parseResult.GetValue(clPathOption),
+                    SolutionDir = parseResult.GetValue(solutionDirOption),
+                    VcToolsInstallDir = parseResult.GetValue(vcToolsInstallDirOption),
+                    MsBuildPath = parseResult.GetValue(msbuildPathOption),
+                    Output = parseResult.GetValue(outputOption),
+                    EnableLogger = parseResult.GetValue(loggerOption),
+                    UseDevEnv = parseResult.GetValue(useDevEnvOption),
+                    AllConfigurations = parseResult.GetValue(allConfigsOption),
+                    Merge = parseResult.GetValue(mergeOption),
+                    Strict = parseResult.GetValue(strictOption),
+                    Validate = parseResult.GetValue(validateOption),
+                    Format = parseResult.GetValue(formatOption)!,
+                    Deduplicate = parseResult.GetValue(deduplicateOption),
+                    PreferConfiguration = parseResult.GetValue(preferConfigOption)!,
+                    PreferPlatform = parseResult.GetValue(preferPlatformOption)!,
+                    ListInstances = parseResult.GetValue(listInstancesOption),
+                    VsInstance = parseResult.GetValue(vsInstanceOption),
+                    EmitCCppProperties = parseResult.GetValue(cCppPropertiesOption),
+                    EmitDefaults = parseResult.GetValue(emitDefaultsOption),
+                    MergeDefaults = parseResult.GetValue(mergeDefaultsOption),
+                    SplitByProject = parseResult.GetValue(splitByProjectOption),
+                    UseCache = parseResult.GetValue(useCacheOption),
+                    MsBuildProperties = ParseKeyValuePairs(parseResult.GetValue(msbuildPropertyOption), "--msbuild-property"),
+                    MsBuildEnv = ParseKeyValuePairs(parseResult.GetValue(msbuildEnvOption), "--msbuild-env"),
+                    MsBuildLauncher = parseResult.GetValue(msbuildLauncherOption)!,
+                    IncludePathOrder = parseResult.GetValue(includePathOrderOption)!
+                };
+            });
+
+            var exitCode = rootCommand.Parse(args).Invoke();
+
+            if (result == null)
+                Environment.Exit(exitCode);
+
+            return result;
+        }
+
+        private static Dictionary<string, string> ParseKeyValuePairs(string[]? values, string flagName)
+        {
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (values == null) return dict;
+            foreach (string entry in values)
+            {
+                int separatorIndex = entry.IndexOf('=');
+                if (separatorIndex <= 0)
+                    throw new ArgumentException($"{flagName} value '{entry}' must be in KEY=VALUE form.");
+                dict[entry.Substring(0, separatorIndex)] = entry.Substring(separatorIndex + 1);
+            }
+            return dict;
+        }
+    }
+}

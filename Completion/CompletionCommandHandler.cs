@@ -101,7 +101,7 @@ namespace CodeWeave
 			if (!hasCompletionUpdated_ && nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB)
 			{
 
-				var tagger = GetTagger();
+                CompletionTagger tagger = GetTagger();
 
 				if (tagger != null)
 				{
@@ -119,7 +119,7 @@ namespace CodeWeave
 			}
 			else if (nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN || nCmdID == (uint)VSConstants.VSStd2KCmdID.CANCEL)
 			{
-				var tagger = GetTagger();
+                CompletionTagger tagger = GetTagger();
 				if (tagger != null)
 				{
 					tagger.ClearSuggestion();

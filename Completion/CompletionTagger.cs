@@ -77,7 +77,7 @@ namespace CodeWeave
 				string currentText = line.Substring(0, caretPoint);
 				combineSuggestion = currentText + newSuggestion;
 				userEndingText_ = line.Substring(caretPoint).TrimEnd();
-				var userIndex = newSuggestion.IndexOf(userEndingText_);
+                int userIndex = newSuggestion.IndexOf(userEndingText_);
 				if (userIndex < 0)
 				{
 					return;
@@ -184,8 +184,8 @@ namespace CodeWeave
 
 		public void FormatText(TextBlock block)
 		{
-			var line = view_.TextViewLines.FirstVisibleLine;
-			var format = line.GetCharacterFormatting(line.Start);
+            Microsoft.VisualStudio.Text.Formatting.IWpfTextViewLine line = view_.TextViewLines.FirstVisibleLine;
+            TextRunProperties format = line.GetCharacterFormatting(line.Start);
 			if (format != null)
 			{
 				block.FontFamily = format.Typeface.FontFamily;
@@ -408,7 +408,7 @@ namespace CodeWeave
 		{
 			CaretPosition caretPosition = view_.Caret.Position;
 
-			var textPoint = caretPosition.Point.GetPoint(buffer_, caretPosition.Affinity);
+            SnapshotPoint? textPoint = caretPosition.Point.GetPoint(buffer_, caretPosition.Affinity);
 
 			if (!textPoint.HasValue)
 			{

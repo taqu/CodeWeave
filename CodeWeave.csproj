@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="Commands\CodeUtil.cs" />
+    <Compile Include="Commands\CommandCompileCommandsProject.cs" />
     <Compile Include="Commands\CommandCompletion.cs" />
     <Compile Include="Commands\CommandShowChatWindow.cs" />
     <Compile Include="Completion\CompletionCommandHandler.cs" />
@@ -61,6 +62,21 @@
     <Compile Include="llama.cpp\LlamaCompletionEngine.cs" />
     <Compile Include="llama.cpp\LlamaInterop.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="MSBuildExtractor\ClExeValidator.cs" />
+    <Compile Include="MSBuildExtractor\CommandLineOptions.cs" />
+    <Compile Include="MSBuildExtractor\CommandLineTokenizer.cs" />
+    <Compile Include="MSBuildExtractor\CompileCommandDeduplicator.cs" />
+    <Compile Include="MSBuildExtractor\DevEnvReader.cs" />
+    <Compile Include="MSBuildExtractor\ExtractorCache.cs" />
+    <Compile Include="MSBuildExtractor\InProcessExtractor.cs" />
+    <Compile Include="MSBuildExtractor\Models.cs" />
+    <Compile Include="MSBuildExtractor\MSBuildExtractor.cs" />
+    <Compile Include="MSBuildExtractor\MsvcSanitizer.cs" />
+    <Compile Include="MSBuildExtractor\OutOfProcessExtractor.cs" />
+    <Compile Include="MSBuildExtractor\ProjectDiscovery.cs" />
+    <Compile Include="MSBuildExtractor\RichDatabase.cs" />
+    <Compile Include="MSBuildExtractor\VsCodeSettings.cs" />
+    <Compile Include="MSBuildExtractor\VsWhereHelper.cs" />
     <Compile Include="Options\OptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -129,9 +145,12 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +162,27 @@
     <PackageReference Include="MessagePack">
       <Version>3.1.4</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Build">
+      <Version>18.7.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Framework">
+      <Version>18.7.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Locator">
+      <Version>1.11.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <Version>10.0.9</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" />
+    <PackageReference Include="MSBuild.StructuredLogger">
+      <Version>2.3.204</Version>
+    </PackageReference>
     <PackageReference Include="murmurhash">
       <Version>1.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="System.CommandLine">
+      <Version>2.0.9</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

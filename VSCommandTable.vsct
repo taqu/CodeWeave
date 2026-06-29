@@ -10,8 +10,8 @@
 			<Group guid="CodeWeave" id="CodeWeave_CommandGroup" priority="0x0600">
 				<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
 			</Group>
-			<Group guid="CodeWeave" id="CodeWeave_ViewCommandGroup" priority="0x0600">
-				<Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+			<Group guid="CodeWeave" id="CodeWeave_ViewCommandGroup">
+				<Parent guid="guidSHLMainMenu" id="View.DevWindowsGroup.OtherWindows.Group1" />
 			</Group>
 
 			<Group guid="CodeWeave" id="CodeWeave_SubMenuGroup" priority="0x0100">
@@ -52,7 +52,7 @@
 				</Strings>
 			</Button>
 			<Button guid="CodeWeave" id="CommandShowChatWindow" priority="0x0100" type="Button">
-				<Parent guid="CodeWeave" id="CodeWeave_ViewSubMenuGroup" />
+				<Parent guid="CodeWeave" id="CodeWeave_SubMenuGroup" />
 				<Icon guid="ImageCatalogGuid" id="Writeable" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
@@ -60,8 +60,30 @@
 					<LocCanonicalName>.CodeWeave.CommandShowChatWindow</LocCanonicalName>
 				</Strings>
 			</Button>
+			<!--
+			<Button guid="CodeWeave" id="CommandCompileCommandsProject" type="Button">
+				<Icon guid="ImageCatalogGuid" id="Writeable" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Extract Compile Commands</ButtonText>
+					<CommandName>CommandCompileCommandsProject</CommandName>
+				</Strings>
+			</Button>
+			-->
 		</Buttons>
 	</Commands>
+
+<!--
+	<CommandPlacements>
+		<CommandPlacement guid="CodeWeave" id="CommandCompileCommandsProject" priority="0x3000">
+			<Parent guid="VSMainMenu" id="ProjectNode.BuildGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="CodeWeave" id="CommandCompileCommandsProject" priority="0x3000">
+			<Parent guid="VSMainMenu" id="ProjectNode.MultiProjectBuildGroup" />
+		</CommandPlacement>
+	</CommandPlacements>
+	-->
+
 
 	<Symbols>
 		<GuidSymbol name="CodeWeave" value="{de94022d-cce2-425f-882c-ec1f9f9dfdc9}">
@@ -69,10 +91,12 @@
 			<IDSymbol name="CodeWeave_ViewCommandGroup" value="0x0002"/>
 			<IDSymbol name="CodeWeave_SubMenuGroup" value="0x0003" />
 			<IDSymbol name="CodeWeave_ViewSubMenuGroup" value="0x0004"/>
+			<IDSymbol name="CodeWeave_MenuProjectGroup" value="0x0005" />
 			<IDSymbol name="CodeWeave_Menu" value="0x0010" />
 			<IDSymbol name="CodeWeave_ViewMenu" value="0x0020" />
 			<IDSymbol name="CommandCompletion" value="0x0100" />
 			<IDSymbol name="CommandShowChatWindow" value="0x0101" />
+			<IDSymbol name="CommandCompileCommandsProject" value="0x0102" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

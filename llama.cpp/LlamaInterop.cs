@@ -297,7 +297,7 @@ namespace CodeWeave
                                            parseSpecial ? (byte)1 : (byte)0);
                     if (n >= 0) return Array.Empty<int>(); // should be negative when buffer is null
                     n = -n;
-                    var ids = new int[n];
+                    int[] ids = new int[n];
                     fixed (int* tokPtr = ids)
                     {
                         llama_tokenize(vocab, (IntPtr)textPtr, utf8.Length,

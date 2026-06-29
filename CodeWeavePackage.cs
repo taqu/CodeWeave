@@ -7,6 +7,7 @@ using EnvDTE80;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
 using System.IO.Packaging;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -78,7 +79,7 @@ namespace CodeWeave
                 {
                     if(null != engine_)
                     {
-                        if (CodeWeavePackage.TryGetPackage(out var package))
+                        if (CodeWeavePackage.TryGetPackage(out CodeWeavePackage package))
                         {
                             package.Release(engine_);
                             engine_ = null;
@@ -127,7 +128,12 @@ namespace CodeWeave
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await base.InitializeAsync(cancellationToken, progress);
+            try {
             await this.RegisterCommandsAsync();
+                }catch(ReflectionTypeLoadException e)
+            {
+                await Log.OutputAsync(e.LoaderExceptions.ToString());
+            }
             this.RegisterToolWindows();
             package_ = new WeakReference<CodeWeavePackage>(this);
             dte2_ = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;

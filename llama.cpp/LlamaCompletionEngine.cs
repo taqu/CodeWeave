@@ -61,7 +61,7 @@ namespace CodeWeave
                 return;
             }
 
-            var mparams = LlamaInterop.DefaultModelParams(nGpuLayers);
+            LlamaInterop.LlamaModelParams mparams = LlamaInterop.DefaultModelParams(nGpuLayers);
             _model = LlamaInterop.llama_model_load_from_file(modelPath, mparams);
             if (_model == IntPtr.Zero)
                 throw new InvalidOperationException($"llama_model_load_from_file failed for: {modelPath}");
@@ -69,7 +69,7 @@ namespace CodeWeave
             _vocab = LlamaInterop.llama_model_get_vocab(_model);
 
             int threads = Math.Max(1, Environment.ProcessorCount);
-            var cparams = LlamaInterop.DefaultContextParams(nCtx, threads);
+            LlamaInterop.LlamaContextParams cparams = LlamaInterop.DefaultContextParams(nCtx, threads);
             _context = LlamaInterop.llama_init_from_model(_model, cparams);
             if (_context == IntPtr.Zero)
             {
@@ -79,7 +79,7 @@ namespace CodeWeave
             }
 
             // Build sampler chain: min-p(0.05) → temp(0.2) → dist
-            var sparams = new LlamaInterop.LlamaSamplerChainParams { no_perf = 1 };
+            LlamaInterop.LlamaSamplerChainParams sparams = new LlamaInterop.LlamaSamplerChainParams { no_perf = 1 };
             _sampler = LlamaInterop.llama_sampler_chain_init(sparams);
             LlamaInterop.llama_sampler_chain_add(_sampler,
                 LlamaInterop.llama_sampler_init_top_k(top_k));
@@ -136,7 +136,7 @@ namespace CodeWeave
         // returning a ulong suitable as a dictionary key.
         private static ulong ComputeCacheKey(string prefix, string suffix)
         {
-            var enc = Encoding.UTF8;
+            Encoding enc = Encoding.UTF8;
             int pLen = enc.GetByteCount(prefix);
             int sLen = enc.GetByteCount(suffix);
             byte[] buf = new byte[pLen + 1 + sLen];  // prefix + NUL + suffix
@@ -191,7 +191,7 @@ namespace CodeWeave
         private string GenerateInternal(string prefix, string suffix, int prefixTokens, int suffixTokens, int maxTokens, CancellationToken cancellationToken)
         {
             // Build token sequence
-            var allTokens = new List<int>();
+            List<int> allTokens = new List<int>();
             {
                 allTokens.Add(_fimPre);
                 allTokens.AddRange(LlamaInterop.Tokenize(_vocab, prefix, addSpecial: false, parseSpecial: true));
@@ -209,7 +209,7 @@ namespace CodeWeave
                 commonLen++;
 
             // Trim (or fully clear) the KV cache to the common prefix length.
-            var mem = LlamaInterop.llama_get_memory(_context);
+            IntPtr mem = LlamaInterop.llama_get_memory(_context);
             if (commonLen > 0) {
                 LlamaInterop.llama_memory_seq_rm(mem, 0, commonLen, -1);
             }
@@ -223,7 +223,7 @@ namespace CodeWeave
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 int count = Math.Min(batchMax, allTokens.Count - i);
-                var chunk = new int[count];
+                int[] chunk = new int[count];
                 allTokens.CopyTo(i, chunk, 0, count);
 
                 if (DecodeBatch(chunk) != 0)
@@ -269,10 +269,10 @@ namespace CodeWeave
 
         private int DecodeBatch(int[] tokens)
         {
-            var handle = GCHandle.Alloc(tokens, GCHandleType.Pinned);
+            GCHandle handle = GCHandle.Alloc(tokens, GCHandleType.Pinned);
             try
             {
-                var batch = LlamaInterop.llama_batch_get_one(handle.AddrOfPinnedObject(), tokens.Length);
+                LlamaInterop.LlamaBatch batch = LlamaInterop.llama_batch_get_one(handle.AddrOfPinnedObject(), tokens.Length);
                 return LlamaInterop.llama_decode(_context, batch);
             }
             finally
