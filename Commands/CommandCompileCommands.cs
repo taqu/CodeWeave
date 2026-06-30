@@ -1,3 +1,5 @@
+using EnvDTE;
+using Microsoft.VisualStudio.VCProjectEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,26 @@ namespace CodeWeave.Commands
             CodeWeavePackage package = null;
 			if(!CodeWeavePackage.TryGetPackage(out package)){
 				return;
-			}
+            }
+            EnvDTE.SelectedItems selectedItems = package.DTE.SelectedItems;
+            if(null == selectedItems)
+            {
+                return;
+            }
+            foreach(SelectedItem item in selectedItems)
+            {
+                ProjectItem projectItem = item.ProjectItem;
+                Log.Output("Compiling project: " + projectItem.Object.GetType().FullName);
+                if(item is EnvDTE.Solution)
+                {
+                    break;
+                }
+                if(item is VCProject)
+                {
+                    EnvDTE.Project project = item as EnvDTE.Project;
+                    Log.Output("Compiling project: " + project.Name);
+                }
+            }
 #if false
 // 1. ソリューションファイルのフルパスを取得 (例: C:\Projects\MySolution.sln)
     string solutionPath = dte.Solution.FullName;

@@ -80,10 +80,10 @@
 
 	<CommandPlacements>
 		<CommandPlacement guid="CodeWeave" id="CommandCompileCommands" priority="0x3000">
-			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_SOLNNODE" />
+			<Parent guid="guidSHLMainMenu" id="SolutionNode.BuildGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="CodeWeave" id="CommandCompileCommands" priority="0x3000">
-			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_XPROJ_MULTIPROJ" />
+			<Parent guid="guidSHLMainMenu" id="ProjectNode.MultiProjectBuildGroup" />
 		</CommandPlacement>
 	</CommandPlacements>
 
