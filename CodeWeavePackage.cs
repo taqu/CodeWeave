@@ -128,12 +128,7 @@ namespace CodeWeave
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await base.InitializeAsync(cancellationToken, progress);
-            try {
             await this.RegisterCommandsAsync();
-                }catch(ReflectionTypeLoadException e)
-            {
-                await Log.OutputAsync(e.LoaderExceptions.ToString());
-            }
             this.RegisterToolWindows();
             package_ = new WeakReference<CodeWeavePackage>(this);
             dte2_ = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;

@@ -49,7 +49,7 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="Commands\CodeUtil.cs" />
-    <Compile Include="Commands\CommandCompileCommandsProject.cs" />
+    <Compile Include="Commands\CommandCompileCommands.cs" />
     <Compile Include="Commands\CommandCompletion.cs" />
     <Compile Include="Commands\CommandShowChatWindow.cs" />
     <Compile Include="Completion\CompletionCommandHandler.cs" />
@@ -62,21 +62,7 @@
     <Compile Include="llama.cpp\LlamaCompletionEngine.cs" />
     <Compile Include="llama.cpp\LlamaInterop.cs" />
     <Compile Include="Log.cs" />
-    <Compile Include="MSBuildExtractor\ClExeValidator.cs" />
-    <Compile Include="MSBuildExtractor\CommandLineOptions.cs" />
-    <Compile Include="MSBuildExtractor\CommandLineTokenizer.cs" />
-    <Compile Include="MSBuildExtractor\CompileCommandDeduplicator.cs" />
-    <Compile Include="MSBuildExtractor\DevEnvReader.cs" />
-    <Compile Include="MSBuildExtractor\ExtractorCache.cs" />
-    <Compile Include="MSBuildExtractor\InProcessExtractor.cs" />
-    <Compile Include="MSBuildExtractor\Models.cs" />
-    <Compile Include="MSBuildExtractor\MSBuildExtractor.cs" />
-    <Compile Include="MSBuildExtractor\MsvcSanitizer.cs" />
-    <Compile Include="MSBuildExtractor\OutOfProcessExtractor.cs" />
-    <Compile Include="MSBuildExtractor\ProjectDiscovery.cs" />
-    <Compile Include="MSBuildExtractor\RichDatabase.cs" />
-    <Compile Include="MSBuildExtractor\VsCodeSettings.cs" />
-    <Compile Include="MSBuildExtractor\VsWhereHelper.cs" />
+    <Compile Include="MSBuildExtractor\CompileCommandsExtractor.cs" />
     <Compile Include="Options\OptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -100,9 +86,142 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\Murmurhash.md" />
+    <Content Include="MSBuildExtractor\bin\cs\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\de\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\es\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\fr\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\it\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\ja\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\ko\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\Microsoft.Build.Locator.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\Microsoft.Data.Sqlite.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\Microsoft.NET.StringTools.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\msbuild-extractor.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\msbuild-extractor.exe">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\msbuild-extractor.pdb">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\MurmurHash.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\pl\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\pt-BR\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\runtimes\win-x64\native\e_sqlite3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\runtimes\win\lib\net10.0\System.Diagnostics.EventLog.Messages.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\ru\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.batteries_v2.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.core.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.provider.e_sqlite3.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\StructuredLogger.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\System.CommandLine.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\System.Configuration.ConfigurationManager.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\System.Diagnostics.EventLog.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\System.Security.Cryptography.ProtectedData.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\tr\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\zh-Hans\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\zh-Hant\System.CommandLine.resources.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\Qwen2.5-Coder-1.5B-CodeFIM.IQ4_XS.gguf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="MSBuildExtractor\bin\LICENSE" />
+    <Content Include="MSBuildExtractor\bin\msbuild-extractor.deps.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MSBuildExtractor\bin\msbuild-extractor.runtimeconfig.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -159,21 +278,6 @@
     </PackageReference>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.13" PrivateAssets="all" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.549" ExcludeAssets="Runtime" />
-    <PackageReference Include="MessagePack">
-      <Version>3.1.4</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Build">
-      <Version>18.7.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Build.Framework">
-      <Version>18.7.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Build.Locator">
-      <Version>1.11.2</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Data.Sqlite">
-      <Version>10.0.9</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" />
     <PackageReference Include="MSBuild.StructuredLogger">
       <Version>2.3.204</Version>

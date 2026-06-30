@@ -27,10 +27,12 @@ namespace CodeWeave
         public const int CodeWeave_SubMenuGroup = 0x0003;
         public const int CodeWeave_ViewSubMenuGroup = 0x0004;
         public const int CodeWeave_MenuProjectGroup = 0x0005;
+        public const int CodeWeave_ContextSolutionGroup = 0x0006;
+        public const int CodeWeave_ContextProjectGroup = 0x0007;
         public const int CodeWeave_Menu = 0x0010;
         public const int CodeWeave_ViewMenu = 0x0020;
         public const int CommandCompletion = 0x0100;
         public const int CommandShowChatWindow = 0x0101;
-        public const int CommandCompileCommandsProject = 0x0102;
+        public const int CommandCompileCommands = 0x0102;
     }
 }
