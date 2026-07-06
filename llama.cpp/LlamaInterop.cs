@@ -268,9 +268,9 @@ namespace CodeWeave
             foreach (string dll in dlls)
             {
                 string fullPath = System.IO.Path.Combine(extDir, "llama.cpp", "bin", dll);
-                if (LoadLibraryW(fullPath) == IntPtr.Zero)
-                    throw new System.ComponentModel.Win32Exception(
-                        Marshal.GetLastWin32Error(), $"LoadLibrary failed for: {fullPath}");
+                if (LoadLibraryW(fullPath) == IntPtr.Zero) {
+                    throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), $"LoadLibrary failed for: {fullPath}");
+                }
             }
         }
 

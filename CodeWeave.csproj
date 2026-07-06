@@ -48,9 +48,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="ast\AST.cs" />
     <Compile Include="Commands\CodeUtil.cs" />
     <Compile Include="Commands\CommandCompileCommands.cs" />
     <Compile Include="Commands\CommandCompletion.cs" />
+    <Compile Include="Commands\CommandGetAST.cs" />
     <Compile Include="Commands\CommandShowChatWindow.cs" />
     <Compile Include="Completion\CompletionCommandHandler.cs" />
     <Compile Include="Completion\CompletionCommandHandlerProvider .cs" />
@@ -59,6 +61,10 @@
     <Compile Include="Completion\CompletionTaggerProvider.cs" />
     <Compile Include="Completion\IntraGrayTextAdornmentTagger.cs" />
     <Compile Include="Completion\StringUtils.cs" />
+    <Compile Include="RunningDocTableEvents.cs" />
+    <Compile Include="Utility\Files.cs" />
+    <Compile Include="Utility\Utility.cs" />
+    <Compile Include="VcxprojWatcher\FileCache.cs" />
     <Compile Include="llama.cpp\LlamaCompletionEngine.cs" />
     <Compile Include="llama.cpp\LlamaInterop.cs" />
     <Compile Include="Log.cs" />
@@ -77,6 +83,7 @@
     <Compile Include="ToolWindows\ToolWindowChatControl.xaml.cs">
       <DependentUpon>ToolWindowChatControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VcxprojWatcher\VcxprojWatcher.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -86,6 +93,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\Murmurhash.md" />
+    <Content Include="ast\ast.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ast\astd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ast\astd.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="MSBuildExtractor\bin\cs\System.CommandLine.resources.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -118,10 +137,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="MSBuildExtractor\bin\Microsoft.Data.Sqlite.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="MSBuildExtractor\bin\Microsoft.NET.StringTools.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -138,19 +153,11 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="MSBuildExtractor\bin\MurmurHash.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="MSBuildExtractor\bin\pl\System.CommandLine.resources.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="MSBuildExtractor\bin\pt-BR\System.CommandLine.resources.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="MSBuildExtractor\bin\runtimes\win-x64\native\e_sqlite3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -165,18 +172,6 @@
     <Content Include="MSBuildExtractor\bin\ru\System.CommandLine.resources.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.batteries_v2.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.core.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="MSBuildExtractor\bin\SQLitePCLRaw.provider.e_sqlite3.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="MSBuildExtractor\bin\StructuredLogger.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -214,7 +209,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="MSBuildExtractor\bin\LICENSE" />
     <Content Include="MSBuildExtractor\bin\msbuild-extractor.deps.json">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -278,6 +272,9 @@
     </PackageReference>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.13" PrivateAssets="all" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.549" ExcludeAssets="Runtime" />
+    <PackageReference Include="LiteDB">
+      <Version>5.0.21</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" />
     <PackageReference Include="MSBuild.StructuredLogger">
       <Version>2.3.204</Version>

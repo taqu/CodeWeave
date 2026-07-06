@@ -34,5 +34,6 @@ namespace CodeWeave
         public const int CommandCompletion = 0x0100;
         public const int CommandShowChatWindow = 0x0101;
         public const int CommandCompileCommands = 0x0102;
+        public const int CommandGetAST = 0x0103;
     }
 }

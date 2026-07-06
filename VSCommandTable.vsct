@@ -75,6 +75,15 @@
 					<CommandName>CommandCompileCommands</CommandName>
 				</Strings>
 			</Button>
+			<Button guid="CodeWeave" id="CommandGetAST" priority="0x0100" type="Button">
+				<Parent guid="guidSHLMainMenu" id="ProjectNode.BuildGroup"/>
+				<Icon guid="ImageCatalogGuid" id="Writeable" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Get AST</ButtonText>
+					<CommandName>CommandGetAST</CommandName>
+				</Strings>
+			</Button>
 		</Buttons>
 	</Commands>
 
@@ -84,6 +93,9 @@
 		</CommandPlacement>
 		<CommandPlacement guid="CodeWeave" id="CommandCompileCommands" priority="0x3000">
 			<Parent guid="guidSHLMainMenu" id="ProjectNode.MultiProjectBuildGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="CodeWeave" id="CommandGetAST" priority="0x3000">
+			<Parent guid="guidSHLMainMenu" id="ItemNode.OpenGroup" />
 		</CommandPlacement>
 	</CommandPlacements>
 
@@ -101,6 +113,7 @@
 			<IDSymbol name="CommandCompletion" value="0x0100" />
 			<IDSymbol name="CommandShowChatWindow" value="0x0101" />
 			<IDSymbol name="CommandCompileCommands" value="0x0102" />
+			<IDSymbol name="CommandGetAST" value="0x0103"/>
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

@@ -31,6 +31,7 @@ namespace CodeWeave
         /// </summary>
         public async Task<string> ExtractAsync(
             string inputPath,
+            string outputPath,
             string configuration = "Debug",
             string platform = "x64",
             CancellationToken cancellationToken = default)
@@ -40,11 +41,9 @@ namespace CodeWeave
                 throw new FileNotFoundException(inputPath);
             }
 
-            string outputPath = Path.Combine(
-                Path.GetTempPath(),
-                $"compile_commands_{Guid.NewGuid():N}.json");
-
+            bool solution;
             string arguments = BuildArguments(
+                out solution,
                 inputPath,
                 outputPath,
                 configuration,
@@ -102,8 +101,7 @@ namespace CodeWeave
                 {stderr}
                 """);
             }
-
-            if (!File.Exists(outputPath))
+            if (!solution && !File.Exists(outputPath))
             {
                 throw new InvalidOperationException(
                     $"Extractor succeeded but output file was not generated: {outputPath}");
@@ -113,6 +111,7 @@ namespace CodeWeave
         }
 
         private static string BuildArguments(
+            out bool solution,
             string inputPath,
             string outputPath,
             string configuration,
@@ -123,16 +122,21 @@ namespace CodeWeave
             if (Path.GetExtension(inputPath)
                 .Equals(".sln", StringComparison.OrdinalIgnoreCase))
             {
+                solution = true;
                 sb.Append($"--solution \"{inputPath}\" ");
+                sb.Append("--split-by-project true ");
             }
             else
             {
+                solution = false;
                 sb.Append($"--project \"{inputPath}\" ");
+                sb.Append("--split-by-project false ");
             }
 
             sb.Append($"--configuration \"{configuration}\" ");
             sb.Append($"--platform \"{platform}\" ");
             sb.Append($"--output \"{outputPath}\" ");
+            sb.Append("--deduplicate true ");
 
             return sb.ToString();
         }

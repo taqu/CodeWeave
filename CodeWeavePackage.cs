@@ -2,11 +2,8 @@ global using Community.VisualStudio.Toolkit;
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
-using EnvDTE;
-using EnvDTE80;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
-using System.IO.Packaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -25,13 +22,38 @@ namespace CodeWeave
     {
         public static bool TryGetPackage(out CodeWeavePackage package)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             if (null != package_ && package_.TryGetTarget(out package))
             {
                 return true;
             }
             package = null;
             return false;
+        }
+
+        public static void ScanExistingProjects()
+        {
+            CodeWeavePackage package;
+            if (TryGetPackage(out package))
+            {
+                package.vcxprojWatcher_.StartWatching();
+            }
+        }
+
+        public static async Task RunExtractCompileCommandsAsync(Community.VisualStudio.Toolkit.Project project)
+        {
+            CodeWeavePackage package;
+            if (TryGetPackage(out package))
+            {
+                Community.VisualStudio.Toolkit.Solution solution = await VS.Solutions.GetCurrentSolutionAsync();
+                string vsPath = Path.Combine(Path.GetDirectoryName(solution.FullPath), ".vs");
+                string safeName = Utility.SanitizeFileName(project.Name);
+                string outputPath = Path.Combine(vsPath, $"compile_commands_{safeName}.json");
+                string projectPath = project.FullPath;
+                string cofiguration = await project.GetAttributeAsync("Configuration");
+                string platform = await project.GetAttributeAsync("Platform");
+                string result = await package.CompileCommandsExtractor.ExtractAsync(projectPath, outputPath, cofiguration, platform, System.Threading.CancellationToken.None);
+                await Log.OutputAsync(result);
+            }
         }
 
         public EnvDTE80.DTE2 DTE
@@ -48,6 +70,20 @@ namespace CodeWeave
                     optionPage_ = GetDialogPage(typeof(OptionPage)) as OptionPage;
                 }
                 return optionPage_;
+            }
+        }
+
+        public CompileCommandsExtractor CompileCommandsExtractor
+        {
+            get
+            {
+                if(null == compileCommandsExtractor_)
+                {
+                    string dllPath = Assembly.GetExecutingAssembly().Location;
+                    string extensionDirectory = Path.GetDirectoryName(dllPath);
+                    compileCommandsExtractor_ = new CompileCommandsExtractor(Path.Combine(extensionDirectory, "MSBuildExtractor", "bin", "msbuild-extractor.exe"));
+                }
+                return compileCommandsExtractor_;
             }
         }
 
@@ -118,11 +154,23 @@ namespace CodeWeave
             }
         }
 
+        public AST AST
+        {
+            get
+            {
+                return ast_;
+            }
+        }
+
         private static WeakReference<CodeWeavePackage> package_;
         private object lock_ = new object();
         private LlamaCompletionEngine engine_ = new LlamaCompletionEngine();
-        private EnvDTE80.DTE2 dte2_;
+        private EnvDTE80.DTE2 dte2_ = null;
         private OptionPage optionPage_ = null;
+        private CompileCommandsExtractor compileCommandsExtractor_ = null;
+        private VcxprojWatcher vcxprojWatcher_ = null;
+        private RunningDocTableEvents runningDocTableEvents_ = null;
+        private AST ast_ = null;
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
@@ -152,18 +200,34 @@ namespace CodeWeave
                         engine_.Load(modelPath, optionPage.NumberOfGpuLayers, optionPage.ContextSize, optionPage.Temperature, optionPage.TopP, optionPage.TopK);
                     }
                 }
-            }catch (Exception ex)
+                string dbPath = Path.Combine(Path.GetDirectoryName(dte2_.Solution.FullName), ".vs", "ast_cache.db");
+                ast_ = new AST(dbPath, extDir);
+            }
+            catch (Exception ex)
             {
                 await Log.OutputAsync($"Error loading CodeWeave extension: {ex}");
             }
+            vcxprojWatcher_ = new VcxprojWatcher();
+            vcxprojWatcher_.StartWatching();
+            runningDocTableEvents_ = new RunningDocTableEvents(this);
         }
 
         protected override void Dispose(bool disposing)
         {
+            if(null != vcxprojWatcher_)
+            {
+                vcxprojWatcher_.StopWatching();
+                vcxprojWatcher_ = null;
+            }
             if(null != engine_)
             {
                 engine_.Dispose();
                 engine_ = null;
+            }
+            if(null != ast_)
+            {
+                ast_.Dispose();
+                ast_ = null;
             }
             if (LlamaInterop.Initialized)
             {
