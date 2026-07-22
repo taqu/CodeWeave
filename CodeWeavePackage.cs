@@ -73,7 +73,7 @@ namespace CodeWeave
             }
         }
 
-        public CompileCommandsExtractor CompileCommandsExtractor
+        public Agent Agent
         {
             get
             {
@@ -179,6 +179,7 @@ namespace CodeWeave
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
             package_ = new WeakReference<CodeWeavePackage>(this);
+            CSAgent.AppHost.Initialize(new ConfigurationService(this));
             dte2_ = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
 
             // Explicitly load native DLLs from the extension directory by full path

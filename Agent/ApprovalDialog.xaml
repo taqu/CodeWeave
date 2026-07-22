@@ -1,0 +1,33 @@
+<Window x:Class="CSAgent.ApprovalDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tool Approval Required"
+        Width="420" SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="16">
+        <TextBlock Text="The agent wants to run a tool:" FontWeight="Bold" Margin="0,0,0,8"/>
+
+        <Border BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="3" Padding="10" Margin="0,0,0,12" Background="#F8F8F8">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="Tool: " FontWeight="SemiBold" Width="70"/>
+                    <TextBlock x:Name="ToolNameText" TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Arguments: " FontWeight="SemiBold" Width="70"/>
+                    <TextBlock x:Name="ArgumentsText" TextWrapping="Wrap" MaxWidth="280"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="How would you like to proceed?" Margin="0,0,0,10"/>
+
+        <UniformGrid Columns="2" Rows="2">
+            <Button Content="Allow Once"   Margin="3" Padding="6,4" Click="AllowOnce_Click"/>
+            <Button Content="Always Allow" Margin="3" Padding="6,4" Click="AlwaysAllow_Click"/>
+            <Button Content="Deny Once"    Margin="3" Padding="6,4" Click="DenyOnce_Click"/>
+            <Button Content="Always Deny"  Margin="3" Padding="6,4" Click="AlwaysDeny_Click"/>
+        </UniformGrid>
+    </StackPanel>
+</Window>

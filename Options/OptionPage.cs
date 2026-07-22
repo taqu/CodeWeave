@@ -8,10 +8,20 @@ namespace CodeWeave
 	[ComVisible(true)]
 	public class OptionPage : Microsoft.VisualStudio.Shell.DialogPage
     {
+        [Category("OpenAI")]
+        [DisplayName("API Key")]
+        [Description("OpenAI API key used for the chat agent.")]
+        [PasswordPropertyText(true)]
+        public string OpenAIApiKey
+        {
+            get { return openAIApiKey_; }
+            set { openAIApiKey_ = value; }
+        }
+
         [Category("General")]
         [DisplayName("Load Setting File")]
         [Description("Load \"_codeweave.xml\".")]
-        public bool LoadSettingFile 
+        public bool LoadSettingFile
         {
             get { return loadSettingFile_; }
             set { loadSettingFile_ = value; }
@@ -135,6 +145,7 @@ namespace CodeWeave
             set { completionIntervalInMilliseconds_ = value; }
         }
 
+        private string openAIApiKey_ = string.Empty;
         private bool loadSettingFile_ = true;
         private bool outputDebugLog_ = false;
 		private string modelPath_ = "Resources\\Qwen2.5-Coder-1.5B-CodeFIM.IQ4_XS.gguf";
